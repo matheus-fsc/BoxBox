@@ -1,0 +1,15 @@
+/* Style/Global.css */
+.phasergame-active html, 
+.phasergame-active body, 
+.phasergame-active #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.phasergame-active #phaser-game {
+    width: 100%;
+    height: 100%;
+}
