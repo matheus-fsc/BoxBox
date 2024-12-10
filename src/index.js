@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home/Home";
 import PhaserGame from "./Game/PhaserGame";
-
+import './Fonts/stylesheet.css';
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
