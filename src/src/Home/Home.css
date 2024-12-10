@@ -1,0 +1,28 @@
+:root {
+  /* Adicione variáveis de CSS aqui, se necessário */
+}
+
+.LogoTex {
+  text-shadow: 0px 3.566px 3.566px rgba(0, 0, 0, 0.25);
+  font-family: CardboardCat;
+  font-size: 182.775px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.Logo {
+  background: url(./HomeAssets/Logo.png);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: 800px;
+  height: 224px;
+}
+
+.Home {
+  background: url(./HomeAssets/Cardboardnote.png) lightgray no-repeat;
+  backdrop-filter: blur(2px);
+  width: 468px;
+  height: 541px;
+}
