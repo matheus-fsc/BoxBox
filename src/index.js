@@ -2,8 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home/Home";
-import PhaserGame from "./Game/PhaserGame";
 import './Fonts/stylesheet.css';
+import Preloader from "./Game/Scenes/Preloader";
+import Main from "./Game/Main";
+
+
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -13,7 +16,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/game" element={<PhaserGame />} />
+        <Route path="/game" element={<Main />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
