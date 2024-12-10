@@ -15,7 +15,7 @@ export default function Home() {
   const handlePlayClick = () => {
     const isValidNickname = /^[a-zA-Z0-9_]+$/.test(nickname);
     if (isValidNickname && region) {
-      navigate('/jogar');
+      navigate('/Game/PhaserGame.js');
     } else {
       alert('Por favor, insira um nickname válido e escolha uma região.');
     }

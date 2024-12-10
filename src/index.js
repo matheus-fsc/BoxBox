@@ -14,7 +14,7 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        
+        <Route path="/Game/PhaserGame.js" element={<PhaserGame />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
