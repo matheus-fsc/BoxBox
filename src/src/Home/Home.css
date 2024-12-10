@@ -133,6 +133,31 @@ html {
   color: #51291e; 
 }
 
+.RegisterButton {
+  all: unset;
+  color: #726DA8;
+
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  -webkit-text-stroke-width: 1;
+  -webkit-text-stroke-color: #51291E;
+  font-family: CardboardCat;
+  font-size: 31.229px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  font-size: 31.229px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  cursor: pointer; 
+  transition: transform 0.2s, color 0.2s; 
+}
+
+.RegisterButton:hover {
+  transform: scale(1.05); 
+  color: #a05a28; 
+}
+
 .HomeText {
   color: #726da8;
   text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
