@@ -124,6 +124,13 @@ html {
   line-height: normal;
   width: 257px;
   height: 121px;
+  cursor: pointer; /* Add cursor pointer */
+  transition: transform 0.2s; /* Add transition for smooth effect */
+}
+
+.HomeButton:hover {
+  transform: scale(1.05); /* Slightly increase the size */
+  color: #a97c5b; /* Change color on hover */
 }
 
 .HomeText {
