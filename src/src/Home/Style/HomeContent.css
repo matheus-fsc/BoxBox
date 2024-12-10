@@ -1,0 +1,128 @@
+/* Style/HomeContent.css */
+.HomeContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .InputContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .HomeInput {
+    all: unset;
+    border-radius: 11px;
+    border: 1px solid #d1ad8d;
+    background: #e5dccd;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    width: 264px;
+    height: 68px;
+    padding: 10px;
+    box-sizing: border-box;
+    color: #726da8;
+    font-family: CardboardCat;
+    font-size: 31.229px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .RegionContainer {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  
+  .HomeInputRegion {
+    display: block;
+    all: unset;
+    flex-direction: column;
+    width: 128px;
+    height: 28px;
+    border-radius: 9px;
+    border: 1px solid #bd906f;
+    background: #e5dccd;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #726da8;
+    font-family: CardboardCat;
+    font-size: 15.614px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    align-items: center;
+  }
+  
+  .HomeButton {
+    all: unset;
+    color: #51291e;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke-width: 1;
+    -webkit-text-stroke-color: #a97c5b;
+    font-family: CardboardCat;
+    font-size: 91.387px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    width: 257px;
+    height: 121px;
+    cursor: pointer; 
+    transition: transform 0.2s; 
+  }
+  
+  .HomeButton:hover {
+    transform: scale(1.05); 
+    color: #51291e; 
+  }
+  
+  .RegisterButton {
+    all: unset;
+    color: #726DA8;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    -webkit-text-stroke-width: 1;
+    -webkit-text-stroke-color: #51291E;
+    font-family: CardboardCat;
+    font-size: 31.229px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    cursor: pointer; 
+    transition: transform 0.2s, color 0.2s; 
+  }
+  
+  .RegisterButton:hover {
+    transform: scale(1.05); 
+    color: #a05a28; 
+  }
+  
+  @media (max-width: 768px) {
+    .HomeInput {
+      width: 100%;
+      height: 50px;
+      font-size: 24px;
+    }
+  
+    .HomeButton {
+      font-size: 60px;
+      width: 200px;
+      height: 80px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .HomeInput {
+      width: 100%;
+      height: 40px;
+      font-size: 18px;
+    }
+  
+    .HomeButton {
+      font-size: 40px;
+      width: 150px;
+      height: 60px;
+    }
+  }
