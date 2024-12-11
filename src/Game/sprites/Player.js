@@ -16,7 +16,7 @@ export default class Player {
 
         this.speed = 200;
 
-        this.speedBoost = 600;
+        this.speedBoost = 400;
 
         this.player.setScale(1)
 
@@ -56,15 +56,20 @@ export default class Player {
         });
     }
 
+
     // Função update para movimento do player
     update() {
         let velocityX = 0;
         let velocityY = 0;
 
+        this.speed = this.cursors.shift.isDown ? this.speedBoost : 200;
+
         if (this.cursors.left.isDown || this.wasd.left.isDown) {
             velocityX = -this.speed;
+            this.player.setFlipX(true);
         } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
             velocityX = this.speed;
+            this.player.setFlipX(false);
         }
 
         if (this.cursors.up.isDown || this.wasd.up.isDown) {
@@ -83,7 +88,11 @@ export default class Player {
 
         // Atualizar animação com base na velocidade
         if (velocityX !== 0 || velocityY !== 0) {
-            this.player.anims.play('walk', true);
+            if (this.cursors.shift.isDown) {
+                this.player.anims.play('run', true);
+            } else {
+                this.player.anims.play('walk', true);
+            }
         } else {
             this.player.anims.play('idle', true);
         }

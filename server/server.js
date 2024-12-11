@@ -37,8 +37,8 @@ wss.on('connection', (ws) => {
         const data = JSON.parse(message);
 
         if (data.type === 'updatePosition') {
-            players[data.id] = { x: data.x, y: data.y };
-            console.log(data.x, data.y)
+            players[data.id] = { x: data.x, y: data.y, color: data.color, animation: data.animation };
+            console.log(data.x, data.y, data.color, data.animation)
         }
 
         // Enviar os dados de todos os jogadores para todos os clientes conectados

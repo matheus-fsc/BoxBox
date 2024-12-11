@@ -3,9 +3,13 @@ import Phaser from "phaser";
 import Game from "./Scenes/Game";
 import Preloader from "./Scenes/Preloader";
 import './Style/Global.css';
+import { useLocation } from 'react-router-dom';
 
 const Main = () => {
+  const location = useLocation();
+  const { color } = location.state;
   const gameContainer = useRef(null);
+
 
   useEffect(() => {
     const config = {
@@ -27,6 +31,7 @@ const Main = () => {
     };
 
     const game = new Phaser.Game(config);
+    game.scene.start('preloader', { color: color });
 
     // Atualiza o tamanho do jogo quando a tela for redimensionada
     const handleResize = () => {

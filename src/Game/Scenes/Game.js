@@ -6,28 +6,22 @@ export default class Game extends Phaser.Scene {
     super("game");
     this.socket = null;
     this.playerId = null;
+    this.otherPlayers = {};
+  }
+
+  init(data) {
+    this.color = data.color;
   }
 
   create() {
     // Conectar ao servidor WebSocket
     this.socket = new WebSocket('ws://localhost:3001');
-
     // Aguarde a conexão ser aberta antes de enviar qualquer mensagem
-    this.socket.onopen = () => {
-      console.log("Conectado ao servidor");
-
-      // Enviar a mensagem com a posição do player
-      this.socket.send(JSON.stringify({
-        type: 'updatePosition',
-        id: this.playerId,
-        x: this.player.player.x,
-        y: this.player.player.y
-      }));
-    };
 
     // Receber dados do servidor
     this.socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      // console.log(message.players)
 
       if (message.type === 'setId') {
         // Receber o ID único do jogador
@@ -99,7 +93,9 @@ export default class Game extends Phaser.Scene {
         type: 'updatePosition',
         id: this.playerId,
         x: this.player.player.x,
-        y: this.player.player.y
+        y: this.player.player.y,
+        color: this.color,
+        animation: this.player.player.anims.currentAnim.key
       }));
     } else {
       // Caso o WebSocket ainda não esteja aberto, aguarde o evento 'onopen'
@@ -108,36 +104,30 @@ export default class Game extends Phaser.Scene {
           type: 'updatePosition',
           id: this.playerId,
           x: this.player.player.x,
-          y: this.player.player.y
+          y: this.player.player.y,
+          color: this.color,
+          animation: this.player.player.anims.currentAnim.key
         }));
       };
     }
   }
 
   updatePlayers(players) {
-    // Inicializar ou garantir que `otherPlayers` existe
-    if (!this.otherPlayers) {
-      this.otherPlayers = {};
-    }
 
     // Atualizar ou criar sprites para todos os jogadores recebidos do servidor
     Object.keys(players).forEach((id) => {
-
-
       if (id === this.playerId) {
         // Ignorar o jogador local (já gerenciado por `this.player`)
         return;
       }
-
-
-
       const playerData = players[id];
 
       if (!this.otherPlayers[id]) {
         // Criar sprite para um novo jogador
         if (playerData.x !== undefined && playerData.y !== undefined) {
-          const newPlayer = this.add.sprite(playerData.x, playerData.y, 'player');
+          const newPlayer = this.add.sprite(playerData.x, playerData.y, 'player-' + playerData.color);
           this.otherPlayers[id] = newPlayer;
+          console.log(playerData);
         }
       } else {
         // Atualizar a posição do jogador existente
