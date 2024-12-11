@@ -32,7 +32,7 @@
   margin-bottom: 10px;
 }
 
-.RegionContainer {
+.RegionContainer, .colorContainer {
   display: flex;
   justify-content: flex-end;
   width: 100%;
