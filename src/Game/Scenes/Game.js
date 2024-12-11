@@ -36,6 +36,7 @@ export default class Game extends Phaser.Scene {
 
       if (message.type === 'players') {
         // Atualizar a posição de todos os jogadores
+        console.log(message.players);
         this.updatePlayers(message.players);
       }
     };
@@ -86,6 +87,7 @@ export default class Game extends Phaser.Scene {
     // Atualiza a posição do player
     if (this.player) {
       this.player.update(this.cursors);
+      this.sendPosition();
     } else {
       console.error("Player não foi criado corretamente.");
     }
@@ -114,13 +116,43 @@ export default class Game extends Phaser.Scene {
   }
 
   updatePlayers(players) {
-    // Atualiza a posição dos outros jogadores
+    // Inicializar ou garantir que `otherPlayers` existe
+    if (!this.otherPlayers) {
+      this.otherPlayers = {};
+    }
+
+    // Atualizar ou criar sprites para todos os jogadores recebidos do servidor
     Object.keys(players).forEach((id) => {
-      if (id !== this.playerId) {
-        const playerData = players[id];
-        // Atualize a posição dos outros jogadores com base nos dados recebidos
-        // Aqui você deve criar ou atualizar os jogadores no seu jogo com base nos dados recebidos
+      const playerData = players[id];
+
+      if (players[id] === this.playerId) {
+        // Ignorar o jogador local (já gerenciado por `this.player`)
+        return;
+      }
+
+      if (!this.otherPlayers[id]) {
+        // Criar um sprite para um novo jogador conectado
+        const newPlayerSprite = this.add.sprite(playerData.x, playerData.y, 'player');
+        this.otherPlayers[id] = newPlayerSprite;
+      } else {
+        // Atualizar a posição de um jogador existente
+        const existingPlayerSprite = this.otherPlayers[id];
+        existingPlayerSprite.x = playerData.x;
+        existingPlayerSprite.y = playerData.y;
+      }
+
+    });
+
+    // Remover jogadores desconectados (sprites que não estão mais no `players`)
+    Object.keys(this.otherPlayers).forEach((id) => {
+      if (!players[id]) {
+        this.otherPlayers[id].destroy(); // Remover o sprite
+        delete this.otherPlayers[id]; // Remover do objeto
       }
     });
   }
+
+
+
+
 }

@@ -1,19 +1,25 @@
 const express = require('express');
 const WebSocket = require('ws');
-const cors = require('cors');  // Biblioteca para habilitar CORS
+const http = require('http'); // Importar o módulo HTTP
+const cors = require('cors');
+
 const app = express();
 const port = 3001;
 
-// Usar CORS para permitir conexões do localhost:3000
+// Usar CORS para permitir conexões do frontend
 app.use(cors({
-    origin: 'http://localhost:3000/game',  // Permite conexões do frontend rodando na porta 3000
+    origin: 'http://localhost:3000', // Ajuste para permitir conexões do frontend
     methods: ['GET', 'POST'],
 }));
 
-// Servir os arquivos estáticos (onde seu frontend Phaser está)
+// Servir arquivos estáticos, se necessário
 app.use(express.static('public'));
 
-const wss = new WebSocket.Server({ noServer: true });
+// Criar o servidor HTTP
+const server = http.createServer(app);
+
+// Configurar o WebSocket Server para usar o mesmo servidor HTTP
+const wss = new WebSocket.Server({ server });
 
 // Armazenar os jogadores conectados
 let players = {};
@@ -22,40 +28,34 @@ let players = {};
 wss.on('connection', (ws) => {
     console.log("Novo jogador conectado");
 
-    // Gerar um ID único para o jogador
-    const playerId = Date.now();
-
-    // Enviar uma mensagem para o jogador com o seu ID
+    const playerId = Date.now(); // Gerar ID único
     ws.send(JSON.stringify({ type: 'setId', playerId }));
 
-    // Exibir no terminal quando um jogador se conecta
     console.log(`Jogador ${playerId} conectado`);
 
-    // Quando o servidor receber dados do jogador
     ws.on('message', (message) => {
         const data = JSON.parse(message);
 
-        // Atualiza a posição do jogador
         if (data.type === 'updatePosition') {
             players[data.id] = { x: data.x, y: data.y };
+            console.log(data.x, data.y)
         }
 
         // Enviar os dados de todos os jogadores para todos os clientes conectados
         wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
+            if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({ type: 'players', players }));
             }
         });
     });
 
-    // Quando o jogador se desconectar
     ws.on('close', () => {
         console.log(`Jogador ${playerId} desconectado`);
-        delete players[playerId]; // Remover jogador da lista de players
+        delete players[playerId];
     });
 });
 
-// Iniciar o servidor HTTP
-app.listen(port, () => {
+// Iniciar o servidor HTTP e WebSocket
+server.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
