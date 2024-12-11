@@ -12,6 +12,8 @@ const Main = () => {
       type: Phaser.AUTO,
       width: window.innerWidth,
       height: window.innerHeight,
+      width: window.innerWidth,
+      height: window.innerHeight,
       physics: {
         default: "arcade",
         arcade: {
@@ -32,8 +34,16 @@ const Main = () => {
 
     window.addEventListener("resize", handleResize);
 
+    // Atualiza o tamanho do jogo quando a tela for redimensionada
+    const handleResize = () => {
+      game.scale.resize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       game.destroy(true);
+      window.removeEventListener("resize", handleResize);  // Limpar o evento quando o componente for desmontado
       window.removeEventListener("resize", handleResize);  // Limpar o evento quando o componente for desmontado
     };
   }, []);
@@ -42,3 +52,4 @@ const Main = () => {
 };
 
 export default Main;
+
