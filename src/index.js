@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./Home/Home";
 import './Fonts/stylesheet.css';
-import Preloader from "./Game/Scenes/Preloader";
 import Main from "./Game/Main";
 
 
