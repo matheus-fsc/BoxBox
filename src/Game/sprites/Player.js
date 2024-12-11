@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 export default class Player {
     constructor(scene, x, y, texture) {
         this.scene = scene;
@@ -20,6 +22,15 @@ export default class Player {
 
         // Criar animações
         this.createAnimations();
+
+        // No construtor ou em uma função de inicialização
+        this.cursors = this.scene.input.keyboard.createCursorKeys();
+        this.wasd = {
+            up: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+            down: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+            left: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+            right: this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
+        };
     }
 
     // Função para criar animações
@@ -28,7 +39,7 @@ export default class Player {
             key: 'walk',  // Nome da animação de andar
             frames: this.scene.anims.generateFrameNumbers('player', { start: 4, end: 9 }), // Quadros de 0 a 3 (para esquerda e direita)
             frameRate: 10,  // Taxa de quadros por segundo
-            repeat: -1  // Repetir a animação indefinidamente
+            repeat: -1
         });
 
         this.scene.anims.create({
@@ -46,48 +57,35 @@ export default class Player {
     }
 
     // Função update para movimento do player
-    update(cursors) {
-        // Verifique se o player foi criado corretamente
-        if (!this.player) {
-            console.error('O player não foi inicializado corretamente!');
-            return;
-        }
-
-        let isShiftPressed = cursors.shift.isDown ? true : false; // 100ms para detectar o pressionamento
-
-        // Se Shift estiver pressionado, use a velocidade aumentada
-        let currentSpeed = isShiftPressed ? this.speedBoost : this.speed;
-
+    update() {
         let velocityX = 0;
         let velocityY = 0;
 
-        if (cursors.left.isDown) {
-            velocityX = -currentSpeed;  // Movimento para a esquerda
-            this.player.anims.play(isShiftPressed ? 'run' : 'walk', true);  // Reproduzir animação "walk"
-            this.player.setFlipX(true);  // Inverter horizontalmente (flip no eixo X)
-        } else if (cursors.right.isDown) {
-            velocityX = currentSpeed;  // Movimento para a direita
-            this.player.anims.play(isShiftPressed ? 'run' : 'walk', true);  // Reproduzir animação "walk"
-            this.player.setFlipX(false);  // Voltar para a posição normal (sem flip)
+        if (this.cursors.left.isDown || this.wasd.left.isDown) {
+            velocityX = -this.speed;
+        } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
+            velocityX = this.speed;
         }
 
-        // Movimentação vertical (cima/baixo)
-        if (cursors.up.isDown) {
-            velocityY = -currentSpeed;  // Movimento para cima
-            this.player.anims.play(isShiftPressed ? 'run' : 'walk', true);  // Reproduzir animação "walk"
-        } else if (cursors.down.isDown) {
-            velocityY = currentSpeed;  // Movimento para baixo
-            this.player.anims.play(isShiftPressed ? 'run' : 'walk', true);  // Reproduzir animação "walk"
+        if (this.cursors.up.isDown || this.wasd.up.isDown) {
+            velocityY = -this.speed;
+        } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
+            velocityY = this.speed;
         }
 
-        // Aplicar as velocidades ao sprite
-        this.player.setVelocityX(velocityX);
-        this.player.setVelocityY(velocityY);
+        // Normalizar a velocidade na diagonal
+        if (velocityX !== 0 && velocityY !== 0) {
+            velocityX *= Math.SQRT1_2; // Math.SQRT1_2 é equivalente a 1/√2
+            velocityY *= Math.SQRT1_2;
+        }
 
-        // Se o player não estiver se movendo, reproduz a animação de idle
-        if (velocityX === 0 && velocityY === 0) {
-            this.player.anims.play('idle', true);  // Reproduzir animação "idle"
-            this.isRunning = false;
+        this.player.setVelocity(velocityX, velocityY);
+
+        // Atualizar animação com base na velocidade
+        if (velocityX !== 0 || velocityY !== 0) {
+            this.player.anims.play('walk', true);
+        } else {
+            this.player.anims.play('idle', true);
         }
     }
 }
