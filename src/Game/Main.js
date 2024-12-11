@@ -44,7 +44,7 @@ const Main = () => {
       game.destroy(true);
       window.removeEventListener("resize", handleResize);  // Limpar o evento quando o componente for desmontado
     };
-  }, []);
+   }, [color]);
 
   return <div ref={gameContainer} style={{ width: '100%', height: '100%' }} />;
 };
