@@ -7,6 +7,7 @@ export default class Game extends Phaser.Scene {
     this.socket = null;
     this.playerId = null;
     this.otherPlayers = {};
+    this.playerLastPositions = {};
   }
 
   init(data) {
@@ -14,6 +15,7 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    this.createAllAnimations(['red', 'blue', 'green', 'yellow']);
     // Conectar ao servidor WebSocket
     this.socket = new WebSocket('ws://localhost:3001');
     // Aguarde a conexão ser aberta antes de enviar qualquer mensagem
@@ -113,11 +115,12 @@ export default class Game extends Phaser.Scene {
   }
 
   updatePlayers(players) {
-
+    if (players['null']) {
+      delete players['null'];
+    }
     // Atualizar ou criar sprites para todos os jogadores recebidos do servidor
     Object.keys(players).forEach((id) => {
       if (id === this.playerId) {
-        // Ignorar o jogador local (já gerenciado por `this.player`)
         return;
       }
       const playerData = players[id];
@@ -127,21 +130,49 @@ export default class Game extends Phaser.Scene {
         if (playerData.x !== undefined && playerData.y !== undefined) {
           const newPlayer = this.add.sprite(playerData.x, playerData.y, 'player-' + playerData.color);
           this.otherPlayers[id] = newPlayer;
-          console.log(playerData);
+          this.playerLastPositions[id] = { x: playerData.x, y: playerData.y };
+          if (playerData.animation) {
+            newPlayer.anims.play(playerData.animation + '-' + playerData.color, true);
+            console.log(playerData.animation + '-' + playerData.color);
+          }
         }
       } else {
         // Atualizar a posição do jogador existente
         this.otherPlayers[id].setPosition(playerData.x, playerData.y);
+        if (this.otherPlayers[id]) {
+          this.otherPlayers[id].anims.play(playerData.animation + '-' + playerData.color, true);
+          console.log(playerData.animation + '-' + playerData.color);
+        }
+        // Determinar a direção do movimento
+        const lastPos = this.playerLastPositions[id];
+        const currentPos = { x: playerData.x, y: playerData.y };
+        let movingLeft = false;
+        let movingRight = false;
+
+        if (lastPos) {
+          if (currentPos.x < lastPos.x) {
+            movingLeft = true;
+          } else if (currentPos.x > lastPos.x) {
+            movingRight = true;
+          }
+        }
+
+        if (movingLeft) {
+          this.otherPlayers[id].flipX = true;
+        } else if (movingRight) {
+          this.otherPlayers[id].flipX = false;
+        }
+
+        // Atualizar a última posição
+        this.playerLastPositions[id] = currentPos;
+
       }
 
       if (this.otherPlayers[this.playerId]) {
         this.otherPlayers[this.playerId].destroy();
         delete this.otherPlayers[this.playerId];
       }
-      if (this.otherPlayers['null']) {
-        this.otherPlayers['null'].destroy();
-        delete this.otherPlayers['null'];
-      }
+
     });
 
     // Remover jogadores desconectados (sprites que não estão mais no `players`)
@@ -152,4 +183,34 @@ export default class Game extends Phaser.Scene {
       }
     });
   }
+
+  /**
+     * Cria todas as animações com base nas cores fornecidas.
+     * @param {string[]} colors - Array de cores para criar as animações.
+     */
+  createAllAnimations(colors) {
+    colors.forEach(color => {
+      this.createAnimation('walk', color, 4, 9, 10);
+      this.createAnimation('run', color, 17, 23, 20);
+      this.createAnimation('idle', color, 0, 3, 10);
+    });
+  }
+
+  /**
+   * Cria uma animação específica.
+   * @param {string} type - Tipo da animação (walk, run, idle).
+   * @param {string} color - Cor do jogador.
+   * @param {number} start - Quadro inicial.
+   * @param {number} end - Quadro final.
+   * @param {number} frameRate - Taxa de quadros por segundo.
+   */
+  createAnimation(type, color, start, end, frameRate) {
+    this.anims.create({
+      key: `${type}-${color}`,
+      frames: this.anims.generateFrameNumbers(`player-${color}`, { start, end }),
+      frameRate,
+      repeat: type === 'idle' ? -1 : -1
+    });
+  }
+
 }
