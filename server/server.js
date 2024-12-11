@@ -1,47 +1,62 @@
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const WebSocket = require('ws');
-const http = require('http'); // Importar o módulo HTTP
-const cors = require('cors');
 
 const app = express();
-const port = 3001;
 
-// Usar CORS para permitir conexões do frontend
-app.use(cors({
-    origin: 'http://localhost:3000', // Ajuste para permitir conexões do frontend
-    methods: ['GET', 'POST'],
-}));
+// Carregar os certificados SSL
+const server = https.createServer({
+  cert: fs.readFileSync('./cert.pem'),
+  key: fs.readFileSync('./key.pem')
+}, app);
 
-// Servir arquivos estáticos, se necessário
-app.use(express.static('public'));
-
-// Criar o servidor HTTP
-const server = http.createServer(app);
-
-// Configurar o WebSocket Server para usar o mesmo servidor HTTP
+// Configurar o WebSocket Server para usar o servidor HTTPS
 const wss = new WebSocket.Server({ server });
+
+app.use(express.static('public'));
 
 // Armazenar os jogadores conectados
 let players = {};
 
 // Quando um jogador se conecta
-wss.on('connection', (ws) => {
-    console.log("Novo jogador conectado");
+wss.on('connection', (ws, req) => {
+    console.log(`Novo jogador conectado de ${req.socket.remoteAddress}`);
 
-    const playerId = Date.now(); // Gerar ID único
+    // Gerar ID único para o jogador
+    const playerId = Date.now();
     ws.send(JSON.stringify({ type: 'setId', playerId }));
 
     console.log(`Jogador ${playerId} conectado`);
 
+    // Gerenciar mensagens recebidas
     ws.on('message', (message) => {
-        const data = JSON.parse(message);
+        try {
+            const data = JSON.parse(message);
 
-        if (data.type === 'updatePosition') {
-            players[data.id] = { x: data.x, y: data.y, color: data.color, animation: data.animation };
-            console.log(data.x, data.y, data.color, data.animation)
+            if (data.type === 'updatePosition') {
+                // Atualizar posição do jogador
+                players[playerId] = { x: data.x, y: data.y, color: data.color, animation: data.animation };
+                console.log(`Jogador ${playerId}:`, data);
+            }
+
+            // Enviar os dados de todos os jogadores para todos os clientes conectados
+            wss.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({ type: 'players', players }));
+                }
+            });
+        } catch (error) {
+            console.error(`Erro ao processar mensagem do jogador ${playerId}:`, error);
         }
+    });
 
-        // Enviar os dados de todos os jogadores para todos os clientes conectados
+    // Quando o jogador se desconecta
+    ws.on('close', () => {
+        console.log(`Jogador ${playerId} desconectado`);
+        delete players[playerId];
+
+        // Atualizar todos os clientes sobre a desconexão
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({ type: 'players', players }));
@@ -49,13 +64,14 @@ wss.on('connection', (ws) => {
         });
     });
 
-    ws.on('close', () => {
-        console.log(`Jogador ${playerId} desconectado`);
-        delete players[playerId];
+    // Gerenciar erros
+    ws.on('error', (error) => {
+        console.error(`Erro no jogador ${playerId}:`, error);
     });
 });
 
-// Iniciar o servidor HTTP e WebSocket
-server.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+// Iniciar o servidor HTTPS e WebSocket Secure
+const PORT = 15621;
+server.listen(PORT, () => {
+    console.log(`Servidor seguro rodando em https://localhost:${PORT}`);
 });

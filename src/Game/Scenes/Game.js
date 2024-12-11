@@ -17,7 +17,7 @@ export default class Game extends Phaser.Scene {
   create() {
     this.createAllAnimations(['red', 'blue', 'green', 'yellow']);
     // Conectar ao servidor WebSocket
-    this.socket = new WebSocket('ws://buy-galleries.gl.at.ply.gg:21231');
+    this.socket = new WebSocket('wss://buy-galleries.gl.at.ply.gg:21231');
     // Aguarde a conexão ser aberta antes de enviar qualquer mensagem
 
     // Receber dados do servidor
